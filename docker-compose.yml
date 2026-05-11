@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  trading-system:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: trading-system
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      # Django核心配置
+      - SECRET_KEY=${SECRET_KEY:-change-me-in-production}
+      - DEBUG=${DEBUG:-False}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-*}
+      
+      # 数据库配置 (外部MySQL)
+      - DB_HOST=${DB_HOST:-localhost}
+      - DB_PORT=${DB_PORT:-3306}
+      - DB_NAME=${DB_NAME:-trading_system}
+      - DB_USER=${DB_USER:-trading}
+      - DB_PASSWORD=${DB_PASSWORD:-trading123}
+      
+      # Redis配置 (外部Redis)
+      - REDIS_HOST=${REDIS_HOST:-localhost}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - CELERY_BROKER_URL=redis://${REDIS_HOST:-localhost}:${REDIS_PORT:-6379}/0
+      - CELERY_RESULT_BACKEND=redis://${REDIS_HOST:-localhost}:${REDIS_PORT:-6379}/0
+      
+      # Tushare API
+      - TUSHARE_TOKEN=${TUSHARE_TOKEN:-}
+      
+      # 管理员账号
+      - ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin123456}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@example.com}
+    volumes:
+      - ./logs:/app/logs
+      - ./media:/app/media
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
+    networks:
+      - trading-network
+
+networks:
+  trading-network:
+    driver: bridge

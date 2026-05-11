@@ -1,0 +1,35 @@
+# Django
+*.pyc
+__pycache__/
+db.sqlite3
+*.log
+logs/
+.env
+
+# Python
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Static files
+staticfiles/
+static/dist/
+
+# Media
+media/
+
+# OS
+.DS_Store
+Thumbs.db

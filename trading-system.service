@@ -1,0 +1,17 @@
+[Unit]
+Description=Trading System Docker Compose
+Documentation=https://github.com/your-repo/trading-system
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/opt/trading-system
+ExecStart=/usr/local/bin/docker-compose up -d
+ExecStop=/usr/local/bin/docker-compose down
+ExecReload=/usr/local/bin/docker-compose restart
+TimeoutStartSec=0
+
+[Install]
+WantedBy=multi-user.target
