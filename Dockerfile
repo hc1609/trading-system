@@ -45,15 +45,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
     && echo $TZ > /etc/timezone
 
-# 手动编译安装 TA-Lib C 库
-RUN wget -q http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
-    tar -xzf ta-lib-0.4.0-src.tar.gz && \
+# 手动编译安装 TA-Lib C 库 (使用GitHub镜像)
+RUN wget -q https://github.com/TA-Lib/ta-lib/releases/download/v0.4.0/ta-lib-0.4.0-src.tar.gz -O ta-lib.tar.gz && \
+    tar -xzf ta-lib.tar.gz && \
     cd ta-lib/ && \
     ./configure --prefix=/usr && \
     make -j$(nproc) && \
     make install && \
     cd .. && \
-    rm -rf ta-lib ta-lib-0.4.0-src.tar.gz && \
+    rm -rf ta-lib ta-lib.tar.gz && \
     ldconfig
 
 # 设置工作目录
