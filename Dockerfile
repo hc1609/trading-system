@@ -32,8 +32,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     DJANGO_SETTINGS_MODULE=trading_system.settings \
     TZ=Asia/Shanghai
 
-# 安装系统依赖
+# 安装系统依赖 (包括mysqlclient编译依赖)
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    pkg-config \
+    default-libmysqlclient-dev \
+    build-essential \
     libmariadb3 \
     curl \
     supervisor \
