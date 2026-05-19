@@ -1,7 +1,7 @@
 # ============================================================
-# 交易策略系统 - 一体化部署镜像
+# 交易策略系统 - 应用镜像
 # 包含: Django后端 + Vue前端 + Celery定时任务
-# 外部依赖: MySQL + Redis + Nginx(可选)
+# 外部依赖: MySQL + Redis (需外部提供)
 # ============================================================
 
 FROM python:3.11-slim as frontend-builder
@@ -16,8 +16,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # 构建前端
 WORKDIR /frontend
 COPY frontend/package*.json ./
-RUN npm install
-COPY frontend/ ./
+RUN npm install --production=false
+COPY frontend/ .
 RUN npm run build
 
 # ============================================================
@@ -46,14 +46,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && echo $TZ > /etc/timezone
 
 # 手动编译安装 TA-Lib C 库
-RUN wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
+RUN wget -q http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
     tar -xzf ta-lib-0.4.0-src.tar.gz && \
     cd ta-lib/ && \
     ./configure --prefix=/usr && \
-    make && \
+    make -j$(nproc) && \
     make install && \
     cd .. && \
-    rm -rf ta-lib ta-lib-0.4.0-src.tar.gz
+    rm -rf ta-lib ta-lib-0.4.0-src.tar.gz && \
+    ldconfig
 
 # 设置工作目录
 WORKDIR /app
@@ -67,7 +68,7 @@ RUN pip install --no-cache-dir -r requirements.txt \
 COPY backend/ .
 
 # 从前端构建阶段复制静态文件
-COPY --from=frontend-builder /frontend/dist /app/static/dist
+COPY --from=frontend-builder /frontend/dist ./static/dist
 
 # 创建必要的目录
 RUN mkdir -p /app/logs /app/media /var/log/supervisor /var/run
