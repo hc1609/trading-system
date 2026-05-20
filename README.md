@@ -91,6 +91,110 @@
 
 ## 快速开始
 
+### 方式一: PyCharm本地开发 (推荐)
+
+#### 1. 准备工作
+- 安装 Python 3.11+
+- 安装 MySQL 8.0
+- 安装 Redis
+- 安装 PyCharm (Professional或Community版)
+
+#### 2. 克隆项目
+```bash
+git clone https://github.com/hc1609/trading-system.git
+cd trading-system
+```
+
+#### 3. PyCharm配置
+
+**3.1 打开项目**
+- 打开 PyCharm
+- File → Open → 选择 `trading-system` 目录
+
+**3.2 配置Python虚拟环境**
+- File → Settings → Project: trading-system → Python Interpreter
+- 点击 "Add Interpreter" → "Add Local Interpreter"
+- 选择 "Virtualenv Environment"
+- Location: `trading-system/backend/venv`
+- Base interpreter: 选择 Python 3.11+
+- 点击 "OK"
+
+**3.3 安装依赖**
+- 打开 PyCharm Terminal (底部 Terminal 标签)
+```bash
+cd backend
+pip install -r requirements.txt
+```
+
+**3.4 配置Django**
+- File → Settings → Languages & Frameworks → Django
+- 勾选 "Enable Django Support"
+- Django project root: `trading-system/backend`
+- Settings: `trading_system/settings.py`
+- Manage script: `manage.py`
+- 点击 "OK"
+
+**3.5 配置数据库**
+- 创建MySQL数据库:
+```sql
+CREATE DATABASE trading_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+- 创建 `.env` 文件:
+```bash
+cd backend
+cp .env.example .env
+# 编辑 .env 文件，填入数据库配置
+```
+
+**3.6 数据库迁移**
+- PyCharm Terminal中执行:
+```bash
+python manage.py makemigrations
+python manage.py migrate
+python manage.py createsuperuser  # 创建管理员账号
+```
+
+**3.7 配置运行/调试**
+- Run → Edit Configurations
+- 点击 "+" → 选择 "Django Server"
+- Name: `Run Django Server`
+- Host: `127.0.0.1`
+- Port: `8000`
+- 勾选 "Run browser" 并填入 `http://127.0.0.1:8000/`
+- Environment variables: 添加 `PYTHONUNBUFFERED=1`
+- 点击 "OK"
+
+**3.8 配置Celery (可选)**
+- Run → Edit Configurations
+- 点击 "+" → 选择 "Python"
+- Name: `Celery Worker`
+- Module name: 勾选并填入 `celery`
+- Parameters: `-A trading_system worker -l info`
+- Working directory: `$ProjectFileDir$/backend`
+- 勾选 "Emulate terminal in output console"
+- 点击 "OK"
+
+- 再创建一个 Celery Beat 配置:
+- Name: `Celery Beat`
+- Module name: `celery`
+- Parameters: `-A trading_system beat -l info`
+- Working directory: `$ProjectFileDir$/backend`
+
+**3.9 启动服务**
+- 点击 PyCharm 右上角的运行按钮
+- 或使用快捷键: `Shift + F10` (Windows/Linux) 或 `Control + R` (Mac)
+- 访问: http://127.0.0.1:8000
+
+**3.10 调试代码**
+- 在代码行号旁点击设置断点
+- 点击 "Debug" 按钮 (虫子图标)
+- 或使用快捷键: `Shift + F9` (Windows/Linux) 或 `Control + D` (Mac)
+
+---
+
+### 方式二: 命令行开发
+
 ### 1. 安装依赖
 ```bash
 cd backend
